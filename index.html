@@ -445,5 +445,18 @@ function deleteDay(dateStr){
 
 loadData();
 </script>
+<!-- AUTO-INJECT-START -->
+<script>
+(function(){
+  var key='scHeatCalendar_v1';
+  var newDay={"2026-03-13":{"movers":[{"ticker":"BIAF","hodPct":155.14,"prevClose":1.07,"hod":2.73,"close":2.12,"vol":240989590,"sector":"SERVICES-COMMERCIAL PHYSICAL & BIOLOGICAL RESEARCH","country":"US","float":4.5,"marketCap":9537263.08,"name":"bioAffinity Technologies, Inc. Common Stock"},{"ticker":"ISPC","hodPct":94.6,"prevClose":0.224,"hod":0.4359,"close":0.2844,"vol":269931155,"sector":"SERVICES-COMMERCIAL PHYSICAL & BIOLOGICAL RESEARCH","country":"US","float":9.8,"marketCap":2778876.9504,"name":"iSpecimen Inc. Common Stock"},{"ticker":"MEHA","hodPct":73.22,"prevClose":0.1912,"hod":0.3312,"close":0.193,"vol":187738359,"sector":"MEDICINAL CHEMICALS & BOTANICAL PRODUCTS","country":"US","float":16.3,"marketCap":3150440.132,"name":"Functional Brands, Inc. Common Stock"},{"ticker":"AIFF","hodPct":62.64,"prevClose":1.74,"hod":2.83,"close":2.75,"vol":80566193,"sector":"SERVICES-PREPACKAGED SOFTWARE","country":"US","float":14.2,"marketCap":39088725.5,"name":"Firefly Neuroscience, Inc. Common Stock"},{"ticker":"PXIU","hodPct":62.45,"prevClose":0.2216,"hod":0.36,"close":0.3089,"vol":5138951,"sector":"Unknown","country":"US","float":7.5,"marketCap":0,"name":"T-REX 2X Long UPXI Daily Target ETF"}],"avgPct":89.61}};
+  try{
+    var stored=localStorage.getItem(key);
+    var existing=stored?JSON.parse(stored):{};
+    Object.assign(existing,newDay);
+    localStorage.setItem(key,JSON.stringify(existing));
+  }catch(e){}
+})();
+</script><!-- AUTO-INJECT-END -->
 </body>
 </html>
