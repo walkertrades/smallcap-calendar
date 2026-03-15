@@ -191,17 +191,34 @@ function cleanData(raw){
 }
 
 function loadData(){
+  // Load from embedded data block (injected by daily_update.py)
+  try {
+    if(typeof __DATA__ !== "undefined" && __DATA__){
+      allData = cleanData(__DATA__);
+      setStatus("Loaded");
+    }
+  } catch(e){}
+  // Also merge any local edits from localStorage
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if(raw){ allData=cleanData(JSON.parse(raw)); setStatus("Loaded"); }
+    if(raw){
+      const local = JSON.parse(raw);
+      Object.assign(allData, cleanData(local));
+    }
   } catch(e){}
   render();
 }
 
 function saveData(){
-  try { localStorage.setItem(STORAGE_KEY,JSON.stringify(allData)); setStatus("Saved"); }
+  // Save local edits to localStorage (only affects this browser)
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(allData)); setStatus("Saved"); }
   catch(e){ setStatus("Save failed"); }
 }
+
+// Placeholder — daily_update.py will replace this with real data
+// DATA-START
+var __DATA__ = {};
+// DATA-END
 
 function setStatus(s){ document.getElementById("status").textContent=s; }
 
