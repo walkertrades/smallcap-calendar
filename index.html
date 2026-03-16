@@ -192,7 +192,7 @@ function cleanData(raw){
 
 function loadData(){
   setStatus("Loading...");
-  var url = "data.json?t=" + Date.now();
+  var url = "https://walkertrades.github.io/smallcap-calendar/data.json?t=" + Date.now();
   fetch(url)
     .then(function(r){
       if(!r.ok) throw new Error("HTTP " + r.status);
@@ -428,4 +428,18 @@ function saveEntry(dateStr){
   const movers=entryMovers.filter(m=>m.ticker.trim()&&m.hodPct!=="");
   if(!movers.length){ closePanel(); return; }
   const parsed=movers.map(m=>({...m,hodPct:parseFloat(m.hodPct)||0,prevClose:parseFloat(m.prevClose)||null,hod:parseFloat(m.hod)||null,vol:parseFloat(String(m.vol).replace(/[^0-9.]/g,""))||null,float:parseFloat(m.float)||null}));
-  parsed.sort((a,
+  parsed.sort((a,b)=>b.hodPct-a.hodPct);
+  allData[dateStr]={movers:parsed,avgPct:parsed.reduce((s,m)=>s+m.hodPct,0)/parsed.length};
+  saveData(); render(); showPanel(dateStr);
+}
+
+function deleteDay(dateStr){
+  delete allData[dateStr];
+  saveData(); closePanel();
+}
+
+loadData();
+</script>
+</body>
+</html>
+
