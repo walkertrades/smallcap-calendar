@@ -14,7 +14,7 @@ button{cursor:pointer;}
 .nav-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
 .month-label{font-size:16px;font-weight:600;min-width:145px;text-align:center;}
 .import-btn{background:#1e1e3a;border:1px solid #3a3a5a;color:#7ec8e3;border-radius:6px;padding:6px 10px;font-size:12px;}
-.status{font-size:10px;color:#555;}
+.status{font-size:10px;color:#555;min-width:100px;}
 .legend{display:flex;align-items:center;gap:5px;margin-bottom:12px;flex-wrap:wrap;}
 .swatch{width:22px;height:13px;border-radius:2px;}
 .cal-wrap{display:flex;gap:14px;}
@@ -57,37 +57,28 @@ button{cursor:pointer;}
 .field-label{font-size:9px;color:#666;margin-bottom:2px;}
 input,select{width:100%;background:#0d0d1a;border:1px solid #2a2a4a;border-radius:4px;color:#fff;font-size:11px;padding:4px 6px;}
 .import-panel{background:#13132a;border-radius:10px;padding:16px;margin-bottom:14px;border:1px solid #2a2a4a;}
-.import-title{font-weight:700;font-size:14px;margin-bottom:8px;color:#7ec8e3;}
 textarea{width:100%;height:100px;background:#1a1a35;border:1px solid #3a3a5a;border-radius:6px;color:#fff;font-size:11px;padding:8px;resize:vertical;}
 .import-btns{display:flex;gap:8px;margin-top:8px;align-items:center;}
 .do-import-btn{background:#1a4a2a;border:1px solid #2a7a4a;color:#7dff8a;border-radius:6px;padding:6px 14px;font-size:13px;}
 .import-msg{font-size:12px;}
 .auth-panel{background:#13132a;border-radius:10px;padding:20px;margin-bottom:14px;border:1px solid #2a2a4a;max-width:320px;}
-.auth-title{font-weight:700;font-size:14px;margin-bottom:12px;color:#fff;}
-.auth-input{width:100%;background:#0d0d1a;border:1px solid #3a3a5a;border-radius:6px;color:#fff;font-size:13px;padding:8px 10px;margin-bottom:8px;outline:none;}
-.auth-btns{display:flex;gap:8px;}
-.unlock-btn{background:#cc3333;border:none;color:#fff;border-radius:6px;padding:7px 16px;font-size:13px;}
-.pass-err{font-size:11px;color:#ff8080;margin-bottom:8px;}
 .sector-bar-bg{background:#2a2a4a;border-radius:4px;height:6px;}
 .sector-bar{background:#7ec8e3;border-radius:4px;height:6px;}
 .no-data{text-align:center;padding:20px 0;}
-.no-data-txt{color:#555;font-size:13px;margin-bottom:12px;}
 .btn-row{display:flex;gap:8px;margin-top:4px;}
 </style>
 </head>
 <body>
-
 <div class="header">
   <div class="title">📈 Small Cap Heat Calendar</div>
   <div class="nav-row">
     <button class="nav-btn" onclick="prevMonth()">‹</button>
     <span class="month-label" id="month-label"></span>
     <button class="nav-btn" onclick="nextMonth()">›</button>
-    <button class="import-btn" onclick="requireAuth(()=>toggleImport())">Import</button>
-    <span class="status" id="status"></span>
+    <button class="import-btn" onclick="requireAuth(function(){toggleImport();})">Import</button>
+    <span class="status" id="status">Loading...</span>
   </div>
 </div>
-
 <div class="legend">
   <span style="font-size:11px;color:#aaa;margin-right:4px;">COLD</span>
   <div class="swatch" style="background:#1a4a8a;"></div>
@@ -101,20 +92,20 @@ textarea{width:100%;height:100px;background:#1a1a35;border:1px solid #3a3a5a;bor
   <span style="font-size:11px;color:#aaa;margin-left:4px;">HOT</span>
   <span style="font-size:10px;color:#555;margin-left:10px;">Click to view · Double-click to edit</span>
 </div>
-
 <div id="auth-panel" class="auth-panel" style="display:none;">
-  <div class="auth-title">Admin Access</div>
-  <input class="auth-input" type="password" id="pass-input" placeholder="Enter password..." onkeydown="if(event.key==='Enter')submitPassword()"/>
-  <div class="pass-err" id="pass-err" style="display:none;"></div>
-  <div class="auth-btns">
-    <button class="unlock-btn" onclick="submitPassword()">Unlock</button>
+  <div style="font-weight:700;font-size:14px;margin-bottom:12px;color:#fff;">Admin Access</div>
+  <input id="pass-input" type="password" placeholder="Enter password..."
+    style="width:100%;background:#0d0d1a;border:1px solid #3a3a5a;border-radius:6px;color:#fff;font-size:13px;padding:8px 10px;margin-bottom:8px;outline:none;"
+    onkeydown="if(event.key==='Enter')submitPassword()"/>
+  <div id="pass-err" style="font-size:11px;color:#ff8080;margin-bottom:8px;display:none;"></div>
+  <div style="display:flex;gap:8px;">
+    <button onclick="submitPassword()" style="background:#cc3333;border:none;color:#fff;border-radius:6px;padding:7px 16px;font-size:13px;">Unlock</button>
     <button class="nav-btn" style="font-size:13px;padding:7px 16px;" onclick="closeAuth()">Cancel</button>
   </div>
 </div>
-
 <div id="import-panel" class="import-panel" style="display:none;">
-  <div class="import-title">Import Data (JSON)</div>
-  <div style="font-size:12px;color:#aaa;margin-bottom:8px;">Paste JSON data below. Minimum format: <code style="color:#7ec8e3;">{"2026-03-15":[{"ticker":"ABCD","hodPct":245}]}</code></div>
+  <div style="font-weight:700;font-size:14px;margin-bottom:8px;color:#7ec8e3;">Import Data (JSON)</div>
+  <div style="font-size:12px;color:#aaa;margin-bottom:8px;">Min format: <code style="color:#7ec8e3;">{"2026-03-15":[{"ticker":"ABCD","hodPct":245}]}</code></div>
   <textarea id="import-text" placeholder='{"2026-03-15":[{"ticker":"ABCD","hodPct":245,"prevClose":1.20,"hod":4.14,"vol":15000000,"float":2.1,"sector":"Biotech","country":"US"}]}'></textarea>
   <div class="import-btns">
     <button class="do-import-btn" onclick="handleImport()">Import</button>
@@ -122,7 +113,6 @@ textarea{width:100%;height:100px;background:#1a1a35;border:1px solid #3a3a5a;bor
     <span class="import-msg" id="import-msg"></span>
   </div>
 </div>
-
 <div class="cal-wrap">
   <div class="cal">
     <div class="day-headers">
@@ -134,14 +124,13 @@ textarea{width:100%;height:100px;background:#1a1a35;border:1px solid #3a3a5a;bor
   </div>
   <div class="panel" id="side-panel" style="display:none;"></div>
 </div>
-
 <script>
-const ADMIN_PASS = "Kx7#mQ2!";
-const STORAGE_KEY = "scHeatCalendar_v1";
-const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-const FLAG = {US:"🇺🇸",CA:"🇨🇦",CN:"🇨🇳",IL:"🇮🇱",AU:"🇦🇺",GB:"🇬🇧",DE:"🇩🇪",FR:"🇫🇷",JP:"🇯🇵",KR:"🇰🇷",IN:"🇮🇳"};
-const COUNTRY_NAME = {US:"USA",CA:"Canada",CN:"China",IL:"Israel",AU:"Australia",GB:"UK",DE:"Germany",FR:"France",JP:"Japan",KR:"South Korea",IN:"India"};
-const HOLIDAYS = {
+var ADMIN_PASS = "Kx7#mQ2!";
+var DATA_URL = "https://walkertrades.github.io/smallcap-calendar/data2.json";
+var MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+var FLAG = {US:"🇺🇸",CA:"🇨🇦",CN:"🇨🇳",IL:"🇮🇱",AU:"🇦🇺",GB:"🇬🇧",DE:"🇩🇪",FR:"🇫🇷",JP:"🇯🇵",KR:"🇰🇷",IN:"🇮🇳"};
+var COUNTRY = {US:"USA",CA:"Canada",CN:"China",IL:"Israel",AU:"Australia",GB:"UK",DE:"Germany",FR:"France",JP:"Japan",KR:"South Korea",IN:"India"};
+var HOLIDAYS = {
   "2021-01-01":1,"2021-01-18":1,"2021-02-15":1,"2021-04-02":1,"2021-05-31":1,"2021-06-18":1,"2021-07-05":1,"2021-09-06":1,"2021-11-25":1,"2021-12-24":1,
   "2022-01-17":1,"2022-02-21":1,"2022-04-15":1,"2022-05-30":1,"2022-06-20":1,"2022-07-04":1,"2022-09-05":1,"2022-11-24":1,"2022-12-26":1,
   "2023-01-02":1,"2023-01-16":1,"2023-02-20":1,"2023-04-07":1,"2023-05-29":1,"2023-06-19":1,"2023-07-04":1,"2023-09-04":1,"2023-11-23":1,"2023-12-25":1,
@@ -149,15 +138,23 @@ const HOLIDAYS = {
   "2025-01-01":1,"2025-01-20":1,"2025-02-17":1,"2025-04-18":1,"2025-05-26":1,"2025-06-19":1,"2025-07-04":1,"2025-09-01":1,"2025-11-27":1,"2025-12-25":1,
   "2026-01-01":1,"2026-01-19":1,"2026-02-16":1,"2026-04-03":1,"2026-05-25":1,"2026-06-19":1,"2026-07-03":1,"2026-09-07":1,"2026-11-26":1,"2026-12-25":1,
 };
+var HOLIDAY_NAMES = {
+  "2021-01-01":"New Year's","2021-01-18":"MLK Day","2021-02-15":"Presidents Day","2021-04-02":"Good Friday","2021-05-31":"Memorial Day","2021-06-18":"Juneteenth","2021-07-05":"Independence Day","2021-09-06":"Labor Day","2021-11-25":"Thanksgiving","2021-12-24":"Christmas",
+  "2022-01-17":"MLK Day","2022-02-21":"Presidents Day","2022-04-15":"Good Friday","2022-05-30":"Memorial Day","2022-06-20":"Juneteenth","2022-07-04":"Independence Day","2022-09-05":"Labor Day","2022-11-24":"Thanksgiving","2022-12-26":"Christmas",
+  "2023-01-02":"New Year's","2023-01-16":"MLK Day","2023-02-20":"Presidents Day","2023-04-07":"Good Friday","2023-05-29":"Memorial Day","2023-06-19":"Juneteenth","2023-07-04":"Independence Day","2023-09-04":"Labor Day","2023-11-23":"Thanksgiving","2023-12-25":"Christmas",
+  "2024-01-01":"New Year's","2024-01-15":"MLK Day","2024-02-19":"Presidents Day","2024-03-29":"Good Friday","2024-05-27":"Memorial Day","2024-06-19":"Juneteenth","2024-07-04":"Independence Day","2024-09-02":"Labor Day","2024-11-28":"Thanksgiving","2024-12-25":"Christmas",
+  "2025-01-01":"New Year's","2025-01-20":"MLK Day","2025-02-17":"Presidents Day","2025-04-18":"Good Friday","2025-05-26":"Memorial Day","2025-06-19":"Juneteenth","2025-07-04":"Independence Day","2025-09-01":"Labor Day","2025-11-27":"Thanksgiving","2025-12-25":"Christmas",
+  "2026-01-01":"New Year's","2026-01-19":"MLK Day","2026-02-16":"Presidents Day","2026-04-03":"Good Friday","2026-05-25":"Memorial Day","2026-06-19":"Juneteenth","2026-07-03":"Independence Day","2026-09-07":"Labor Day","2026-11-26":"Thanksgiving","2026-12-25":"Christmas",
+};
 
-let allData = {}, viewYear, viewMonth, selected = null, authed = false, pendingAction = null, entryMovers = [];
-
-const today = new Date();
+var allData = {}, viewYear, viewMonth, selected = null, authed = false, pendingAction = null, entryMovers = [];
+var today = new Date();
 viewYear = today.getFullYear();
 viewMonth = today.getMonth();
 
 function pad(n){ return String(n).padStart(2,"0"); }
 function fmt(v){ return v>=1e6?(v/1e6).toFixed(1)+"M":v>=1e3?(v/1e3).toFixed(0)+"K":String(v); }
+function setStatus(s){ document.getElementById("status").textContent = s; }
 
 function heatColor(v){
   if(v==null) return {bg:"#1e1e2e",text:"#666"};
@@ -175,17 +172,22 @@ function isValidTicker(t){
   if(!t) return false;
   t = t.toUpperCase().trim();
   if(t.includes(".")) return false;
-  return !["W","WS","WT","R"].some(s=>t.endsWith(s)&&t.length>s.length);
+  // Only filter warrant suffixes on tickers longer than 4 chars to avoid false positives like WNW, ABR, etc.
+  if(t.length >= 5 && (t.endsWith("WS") || t.endsWith("WT"))) return false;
+  if(t.length >= 6 && t.endsWith("W")) return false;
+  if(t.length >= 5 && t.endsWith("R")) return false;
+  return true;
 }
 
 function cleanData(raw){
-  const out={};
-  for(const [date,val] of Object.entries(raw)){
-    if(!val||!val.movers) continue;
-    const movers=val.movers.filter(m=>isValidTicker(m.ticker));
+  var out = {};
+  for(var date in raw){
+    var val = raw[date];
+    if(!val || !val.movers) continue;
+    var movers = val.movers.filter(function(m){ return isValidTicker(m.ticker); });
     if(!movers.length) continue;
-    const avgPct=movers.reduce((s,m)=>s+(parseFloat(m.hodPct)||0),0)/movers.length;
-    out[date]={...val,movers,avgPct};
+    var avg = movers.reduce(function(s,m){ return s+(parseFloat(m.hodPct)||0); },0)/movers.length;
+    out[date] = {movers:movers, avgPct:avg};
   }
   return out;
 }
@@ -193,10 +195,7 @@ function cleanData(raw){
 function loadData(){
   setStatus("Loading...");
   render();
-  // Build filename based on current month — forces CDN cache miss on new deploys
-  var now = new Date();
-  var stamp = now.getFullYear() + "-" + String(now.getMonth()+1).padStart(2,"0") + "-" + String(now.getDate()).padStart(2,"0");
-  var url = "https://walkertrades.github.io/smallcap-calendar/data2.json?v=" + stamp;
+  var url = DATA_URL + "?t=" + Date.now();
   fetch(url, {cache:"no-store"})
     .then(function(r){
       if(!r.ok) throw new Error("HTTP "+r.status);
@@ -212,74 +211,71 @@ function loadData(){
     });
 }
 
-function setStatus(s){ document.getElementById("status").textContent=s; }
+function saveData(){ /* data managed via GitHub — no local save */ }
 
 function requireAuth(action){
   if(authed){ action(); return; }
-  pendingAction=action;
-  document.getElementById("auth-panel").style.display="block";
-  document.getElementById("pass-input").value="";
-  document.getElementById("pass-err").style.display="none";
-  setTimeout(()=>document.getElementById("pass-input").focus(),50);
+  pendingAction = action;
+  document.getElementById("pass-input").value = "";
+  document.getElementById("pass-err").style.display = "none";
+  document.getElementById("auth-panel").style.display = "block";
+  setTimeout(function(){ document.getElementById("pass-input").focus(); }, 50);
 }
 
 function submitPassword(){
-  const val=document.getElementById("pass-input").value;
-  if(val===ADMIN_PASS){
-    authed=true;
-    document.getElementById("auth-panel").style.display="none";
-    if(pendingAction){ pendingAction(); pendingAction=null; }
+  var val = document.getElementById("pass-input").value;
+  if(val === ADMIN_PASS){
+    authed = true;
+    document.getElementById("auth-panel").style.display = "none";
+    if(pendingAction){ pendingAction(); pendingAction = null; }
   } else {
-    const err=document.getElementById("pass-err");
-    err.textContent="Incorrect password.";
-    err.style.display="block";
+    var err = document.getElementById("pass-err");
+    err.textContent = "Incorrect password.";
+    err.style.display = "block";
   }
 }
 
 function closeAuth(){
-  document.getElementById("auth-panel").style.display="none";
-  pendingAction=null;
+  document.getElementById("auth-panel").style.display = "none";
+  pendingAction = null;
 }
 
 function toggleImport(){
-  const p=document.getElementById("import-panel");
-  p.style.display=p.style.display==="none"?"block":"none";
-  document.getElementById("import-msg").textContent="";
+  var p = document.getElementById("import-panel");
+  p.style.display = p.style.display === "none" ? "block" : "none";
+  document.getElementById("import-msg").textContent = "";
 }
 
 function closeImport(){
-  document.getElementById("import-panel").style.display="none";
-  document.getElementById("import-msg").textContent="";
-}
-
-function saveData(){
-  // no-op for GitHub Pages version — data is managed via data.json
+  document.getElementById("import-panel").style.display = "none";
 }
 
 function handleImport(){
-  const text=document.getElementById("import-text").value.trim();
-  const msg=document.getElementById("import-msg");
+  var text = document.getElementById("import-text").value.trim();
+  var msg = document.getElementById("import-msg");
   try {
-    const parsed=JSON.parse(text);
-    let count=0;
-    for(const [date,val] of Object.entries(parsed)){
+    var parsed = JSON.parse(text);
+    var count = 0;
+    for(var date in parsed){
+      var val = parsed[date];
+      var movers;
       if(Array.isArray(val)){
-        const movers=val.map(m=>({...m,hodPct:parseFloat(m.hodPct)||0}));
-        movers.sort((a,b)=>b.hodPct-a.hodPct);
-        allData[date]={movers,avgPct:movers.reduce((s,m)=>s+m.hodPct,0)/movers.length};
+        movers = val.map(function(m){ return Object.assign({},m,{hodPct:parseFloat(m.hodPct)||0}); });
       } else if(val.movers){
-        allData[date]={...val,avgPct:val.movers.reduce((s,m)=>s+(parseFloat(m.hodPct)||0),0)/val.movers.length};
-      }
+        movers = val.movers;
+      } else continue;
+      movers.sort(function(a,b){ return b.hodPct-a.hodPct; });
+      var avg = movers.reduce(function(s,m){ return s+m.hodPct; },0)/movers.length;
+      allData[date] = {movers:movers, avgPct:avg};
       count++;
     }
-    allData=cleanData(allData);
-    saveData(); render();
-    msg.style.color="#7dff8a";
-    msg.textContent="Imported "+count+" days!";
-    document.getElementById("import-text").value="";
+    render();
+    msg.style.color = "#7dff8a";
+    msg.textContent = "Imported "+count+" days!";
+    document.getElementById("import-text").value = "";
   } catch(e){
-    msg.style.color="#ff8080";
-    msg.textContent="Invalid JSON: "+e.message;
+    msg.style.color = "#ff8080";
+    msg.textContent = "Invalid JSON: "+e.message;
   }
 }
 
@@ -287,138 +283,108 @@ function prevMonth(){ if(viewMonth===0){viewYear--;viewMonth=11;}else viewMonth-
 function nextMonth(){ if(viewMonth===11){viewYear++;viewMonth=0;}else viewMonth++; selected=null; render(); }
 
 function render(){
-  document.getElementById("month-label").textContent=MONTHS[viewMonth]+" "+viewYear;
-  const grid=document.getElementById("cal-grid");
-  grid.innerHTML="";
-  const firstDay=new Date(viewYear,viewMonth,1).getDay();
-  const daysInMonth=new Date(viewYear,viewMonth+1,0).getDate();
-  for(let i=0;i<firstDay;i++){
-    const el=document.createElement("div");
+  document.getElementById("month-label").textContent = MONTHS[viewMonth]+" "+viewYear;
+  var grid = document.getElementById("cal-grid");
+  grid.innerHTML = "";
+  var firstDay = new Date(viewYear,viewMonth,1).getDay();
+  var daysInMonth = new Date(viewYear,viewMonth+1,0).getDate();
+  for(var i=0;i<firstDay;i++){
+    var el=document.createElement("div");
     el.style.cssText="background:#0d0d1a;border-radius:6px;min-height:76px;";
     grid.appendChild(el);
   }
-  for(let d=1;d<=daysInMonth;d++){
-    const dateStr=`${viewYear}-${pad(viewMonth+1)}-${pad(d)}`;
-    const dow=new Date(viewYear,viewMonth,d).getDay();
-    const isWeekend=dow===0||dow===6;
-    const isHoliday=!!HOLIDAYS[dateStr];
-    const isMarket=!isWeekend&&!isHoliday;
-    const dayData=allData[dateStr];
-    const avg=dayData?parseFloat(dayData.avgPct):null;
-    const {bg,text}=isMarket&&avg!=null?heatColor(avg):{bg:"#141428",text:"#444"};
-    const el=document.createElement("div");
+  for(var d=1;d<=daysInMonth;d++){
+    var dateStr=viewYear+"-"+pad(viewMonth+1)+"-"+pad(d);
+    var dow=new Date(viewYear,viewMonth,d).getDay();
+    var isWeekend=dow===0||dow===6;
+    var isHoliday=!!HOLIDAYS[dateStr];
+    var isMarket=!isWeekend&&!isHoliday;
+    var dayData=allData[dateStr];
+    var avg=dayData?parseFloat(dayData.avgPct):null;
+    var c=isMarket&&avg!=null?heatColor(avg):{bg:"#141428",text:"#444"};
+    var el=document.createElement("div");
     el.className="cell"+(isMarket?" market":"")+(isWeekend?" weekend":"")+(selected===dateStr?" selected":"");
-    el.style.cssText=`background:${bg};color:${text};`;
-    let html=`<div class="cell-date" style="color:${text}">${d}</div>`;
-    if(isHoliday) html+=`<div class="cell-holiday">${getHolidayName(dateStr)}</div>`;
+    el.style.cssText="background:"+c.bg+";color:"+c.text+";";
+    var html="<div class='cell-date' style='color:"+c.text+"'>"+d+"</div>";
+    if(isHoliday) html+="<div class='cell-holiday'>"+(HOLIDAY_NAMES[dateStr]||"Holiday")+"</div>";
     if(dayData&&dayData.movers){
-      dayData.movers.slice(0,3).forEach(m=>{
-        html+=`<div class="cell-ticker" style="color:${text}">* ${m.ticker} <b>${m.hodPct}%</b></div>`;
+      dayData.movers.slice(0,3).forEach(function(m){
+        html+="<div class='cell-ticker' style='color:"+c.text+"'>* "+m.ticker+" <b>"+m.hodPct+"%</b></div>";
       });
     } else if(isMarket){
-      html+=`<div class="cell-add">+ add</div>`;
+      html+="<div class='cell-add'>+ add</div>";
     }
     el.innerHTML=html;
     if(isMarket){
-      el.onclick=()=>{ selected=dateStr; render(); showPanel(dateStr); };
-      el.ondblclick=()=>requireAuth(()=>openEntry(dateStr));
+      (function(ds){ el.onclick=function(){ selected=ds; render(); showPanel(ds); }; })(dateStr);
+      (function(ds){ el.ondblclick=function(){ requireAuth(function(){ openEntry(ds); }); }; })(dateStr);
     }
     grid.appendChild(el);
   }
 }
 
-const HOLIDAY_NAMES = {
-  "2021-01-01":"New Year's","2021-01-18":"MLK Day","2021-02-15":"Presidents Day","2021-04-02":"Good Friday","2021-05-31":"Memorial Day","2021-06-18":"Juneteenth","2021-07-05":"Independence Day","2021-09-06":"Labor Day","2021-11-25":"Thanksgiving","2021-12-24":"Christmas",
-  "2022-01-17":"MLK Day","2022-02-21":"Presidents Day","2022-04-15":"Good Friday","2022-05-30":"Memorial Day","2022-06-20":"Juneteenth","2022-07-04":"Independence Day","2022-09-05":"Labor Day","2022-11-24":"Thanksgiving","2022-12-26":"Christmas",
-  "2023-01-02":"New Year's","2023-01-16":"MLK Day","2023-02-20":"Presidents Day","2023-04-07":"Good Friday","2023-05-29":"Memorial Day","2023-06-19":"Juneteenth","2023-07-04":"Independence Day","2023-09-04":"Labor Day","2023-11-23":"Thanksgiving","2023-12-25":"Christmas",
-  "2024-01-01":"New Year's","2024-01-15":"MLK Day","2024-02-19":"Presidents Day","2024-03-29":"Good Friday","2024-05-27":"Memorial Day","2024-06-19":"Juneteenth","2024-07-04":"Independence Day","2024-09-02":"Labor Day","2024-11-28":"Thanksgiving","2024-12-25":"Christmas",
-  "2025-01-01":"New Year's","2025-01-20":"MLK Day","2025-02-17":"Presidents Day","2025-04-18":"Good Friday","2025-05-26":"Memorial Day","2025-06-19":"Juneteenth","2025-07-04":"Independence Day","2025-09-01":"Labor Day","2025-11-27":"Thanksgiving","2025-12-25":"Christmas",
-  "2026-01-01":"New Year's","2026-01-19":"MLK Day","2026-02-16":"Presidents Day","2026-04-03":"Good Friday","2026-05-25":"Memorial Day","2026-06-19":"Juneteenth","2026-07-03":"Independence Day","2026-09-07":"Labor Day","2026-11-26":"Thanksgiving","2026-12-25":"Christmas",
-};
-function getHolidayName(d){ return HOLIDAY_NAMES[d]||"Holiday"; }
-
 function showPanel(dateStr){
-  const panel=document.getElementById("side-panel");
+  var panel=document.getElementById("side-panel");
   panel.style.display="block";
-  const parts=dateStr.split("-");
-  const dayNum=parseInt(parts[2]);
-  const dayData=allData[dateStr];
-  let html=`<div class="panel-header"><div class="panel-title">${MONTHS[viewMonth]} ${dayNum}, ${viewYear}</div><button class="close-btn" onclick="closePanel()">×</button></div>`;
+  var d=parseInt(dateStr.split("-")[2]);
+  var dayData=allData[dateStr];
+  var html="<div class='panel-header'><div class='panel-title'>"+MONTHS[viewMonth]+" "+d+", "+viewYear+"</div><button class='close-btn' onclick='closePanel()'>×</button></div>";
   if(dayData){
-    html+=`<div class="avg-box"><div class="avg-label">Avg HOD Move (Top ${dayData.movers.length})</div><div class="avg-val">+${parseFloat(dayData.avgPct).toFixed(0)}%</div><div class="avg-sub">prev close to intraday high</div></div>`;
-    html+=`<div class="section-title">TOP HOD MOVERS</div>`;
-    dayData.movers.forEach((m,i)=>{
-      const cc=m.country||"US";
-      html+=`<div class="mover-card">
-        <div class="mover-top">
-          <div class="mover-name"><span class="mover-ticker">#${i+1} ${m.ticker}</span><span style="font-size:13px">${FLAG[cc]||"🌐"}</span><span class="mover-country">${COUNTRY_NAME[cc]||cc}</span></div>
-          <span class="mover-pct">+${m.hodPct}%</span>
-        </div>
-        <div class="mover-row">${m.prevClose?`<span>Prev: <b style="color:#ccc">$${m.prevClose}</b></span>`:""}${m.hod?`<span>HOD: <b style="color:#7dff8a">$${m.hod}</b></span>`:""}</div>
-        <div class="mover-row">${m.vol?`<span>Vol: ${fmt(m.vol)}</span>`:""}${m.float?`<span>Float: ${m.float}M</span>`:""}</div>
-        ${m.sector?`<div class="mover-sector">${m.sector}</div>`:""}
-      </div>`;
+    html+="<div class='avg-box'><div class='avg-label'>Avg HOD Move (Top "+dayData.movers.length+")</div><div class='avg-val'>+"+parseFloat(dayData.avgPct).toFixed(0)+"%</div><div class='avg-sub'>prev close to intraday high</div></div>";
+    html+="<div class='section-title'>TOP HOD MOVERS</div>";
+    dayData.movers.forEach(function(m,i){
+      var cc=m.country||"US";
+      html+="<div class='mover-card'><div class='mover-top'><div class='mover-name'><span class='mover-ticker'>#"+(i+1)+" "+m.ticker+"</span><span style='font-size:13px'>"+(FLAG[cc]||"🌐")+"</span><span class='mover-country'>"+(COUNTRY[cc]||cc)+"</span></div><span class='mover-pct'>+"+m.hodPct+"%</span></div>";
+      html+="<div class='mover-row'>"+(m.prevClose?"<span>Prev: <b style='color:#ccc'>$"+m.prevClose+"</b></span>":"")+(m.hod?"<span>HOD: <b style='color:#7dff8a'>$"+m.hod+"</b></span>":"")+"</div>";
+      html+="<div class='mover-row'>"+(m.vol?"<span>Vol: "+fmt(m.vol)+"</span>":"")+(m.float?"<span>Float: "+m.float+"M</span>":"")+"</div>";
+      html+=(m.sector?"<div class='mover-sector'>"+m.sector+"</div>":"")+"</div>";
     });
-    const counts={};
-    dayData.movers.forEach(m=>{const s=m.sector||"Unknown";counts[s]=(counts[s]||0)+1;});
-    const sectors=Object.entries(counts).sort((a,b)=>b[1]-a[1]);
+    var counts={};
+    dayData.movers.forEach(function(m){ var s=m.sector||"Unknown"; counts[s]=(counts[s]||0)+1; });
+    var sectors=Object.entries(counts).sort(function(a,b){return b[1]-a[1];});
     if(sectors.length){
-      html+=`<div class="section-title" style="margin-top:10px;">SECTOR BREAKDOWN</div>`;
-      sectors.forEach(([s,c])=>{
-        const pct=(c/dayData.movers.length)*100;
-        html+=`<div style="margin-bottom:6px;"><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:2px;"><span>${s}</span><span>${c}</span></div><div class="sector-bar-bg"><div class="sector-bar" style="width:${pct}%"></div></div></div>`;
+      html+="<div class='section-title' style='margin-top:10px;'>SECTOR BREAKDOWN</div>";
+      sectors.forEach(function(sc){
+        html+="<div style='margin-bottom:6px;'><div style='display:flex;justify-content:space-between;font-size:11px;margin-bottom:2px;'><span>"+sc[0]+"</span><span>"+sc[1]+"</span></div><div class='sector-bar-bg'><div class='sector-bar' style='width:"+((sc[1]/dayData.movers.length)*100)+"%'></div></div></div>";
       });
     }
-    html+=`<button class="edit-btn" onclick="requireAuth(()=>openEntry('${dateStr}'))">✏️ Edit This Day</button>`;
+    html+="<button class='edit-btn' onclick=\"requireAuth(function(){ openEntry('"+dateStr+"'); })\">✏️ Edit This Day</button>";
   } else {
-    html+=`<div class="no-data"><div class="no-data-txt">No data for this day yet.</div><button class="add-btn" onclick="requireAuth(()=>openEntry('${dateStr}'))">+ Add Movers</button></div>`;
+    html+="<div class='no-data'><div style='color:#555;font-size:13px;margin-bottom:12px;'>No data for this day yet.</div><button class='add-btn' onclick=\"requireAuth(function(){ openEntry('"+dateStr+"'); })\">+ Add Movers</button></div>";
   }
   panel.innerHTML=html;
 }
 
 function closePanel(){ selected=null; document.getElementById("side-panel").style.display="none"; render(); }
 
-const EMPTY_ROW=()=>({ticker:"",hodPct:"",prevClose:"",hod:"",vol:"",float:"",sector:"",country:"US"});
+var EMPTY_ROW=function(){ return {ticker:"",hodPct:"",prevClose:"",hod:"",vol:"",float:"",sector:"",country:"US"}; };
 
 function openEntry(dateStr){
   selected=dateStr;
-  const existing=allData[dateStr];
-  entryMovers=existing?[...existing.movers.map(m=>({...m}))]:[];
+  var existing=allData[dateStr];
+  entryMovers=existing?existing.movers.map(function(m){ return Object.assign({},m); }):[];
   while(entryMovers.length<5) entryMovers.push(EMPTY_ROW());
   renderEntry(dateStr);
 }
 
 function renderEntry(dateStr){
-  const panel=document.getElementById("side-panel");
+  var panel=document.getElementById("side-panel");
   panel.style.display="block";
-  const parts=dateStr.split("-");
-  const dayNum=parseInt(parts[2]);
-  let html=`<div class="panel-header"><div class="panel-title">${MONTHS[viewMonth]} ${dayNum}, ${viewYear}</div><button class="close-btn" onclick="closePanel()">×</button></div>`;
-  html+=`<div style="font-size:12px;color:#aaa;margin-bottom:10px;">Enter top HOD movers:</div>`;
-  entryMovers.forEach((m,i)=>{
-    html+=`<div class="entry-row">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-        <span style="font-size:11px;font-weight:700;color:#aaa;">#${i+1}</span>
-        <button style="background:none;border:none;color:#555;font-size:13px;cursor:pointer;" onclick="clearRow(${i})">×</button>
-      </div>
-      <div class="entry-grid">
-        ${["ticker","hodPct","prevClose","hod","vol","float"].map((f,fi)=>`<div><div class="field-label">${["Ticker","HOD %","Prev Close","HOD Price","Volume","Float (M)"][fi]}</div><input value="${m[f]||""}" onchange="updateRow(${i},'${f}',this.value)" type="${fi===0||fi===4?"text":"number"}"/></div>`).join("")}
-      </div>
-      <div class="entry-grid" style="margin-top:5px;">
-        <div><div class="field-label">Sector</div><input value="${m.sector||""}" onchange="updateRow(${i},'sector',this.value)"/></div>
-        <div><div class="field-label">Country</div>
-          <select onchange="updateRow(${i},'country',this.value)">
-            ${Object.entries(COUNTRY_NAME).map(([c,n])=>`<option value="${c}"${m.country===c?" selected":""}>${FLAG[c]} ${n}</option>`).join("")}
-          </select>
-        </div>
-      </div>
-    </div>`;
+  var d=parseInt(dateStr.split("-")[2]);
+  var html="<div class='panel-header'><div class='panel-title'>"+MONTHS[viewMonth]+" "+d+", "+viewYear+"</div><button class='close-btn' onclick='closePanel()'>×</button></div>";
+  html+="<div style='font-size:12px;color:#aaa;margin-bottom:10px;'>Enter top HOD movers:</div>";
+  entryMovers.forEach(function(m,i){
+    html+="<div class='entry-row'><div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;'><span style='font-size:11px;font-weight:700;color:#aaa;'>#"+(i+1)+"</span><button style='background:none;border:none;color:#555;font-size:13px;cursor:pointer;' onclick='clearRow("+i+")'>×</button></div>";
+    html+="<div class='entry-grid'>";
+    [["ticker","Ticker","text"],["hodPct","HOD %","number"],["prevClose","Prev Close","number"],["hod","HOD Price","number"],["vol","Volume","text"],["float","Float (M)","number"]].forEach(function(f){
+      html+="<div><div class='field-label'>"+f[1]+"</div><input type='"+f[2]+"' value='"+(m[f[0]]||"")+"' onchange='updateRow("+i+",\""+f[0]+"\",this.value)'/></div>";
+    });
+    html+="</div><div class='entry-grid' style='margin-top:5px;'><div><div class='field-label'>Sector</div><input value='"+(m.sector||"")+"' onchange='updateRow("+i+",\"sector\",this.value)'/></div>";
+    html+="<div><div class='field-label'>Country</div><select onchange='updateRow("+i+",\"country\",this.value)'>";
+    Object.keys(COUNTRY).forEach(function(cc){ html+="<option value='"+cc+"'"+(m.country===cc?" selected":"")+">"+FLAG[cc]+" "+COUNTRY[cc]+"</option>"; });
+    html+="</select></div></div></div>";
   });
-  html+=`<div class="btn-row">
-    <button class="save-btn" onclick="saveEntry('${dateStr}')">Save Day</button>
-    <button class="cancel-btn" onclick="showPanel('${dateStr}')">Cancel</button>
-    ${allData[dateStr]?`<button class="del-btn" onclick="deleteDay('${dateStr}')">Del</button>`:""}
-  </div>`;
+  html+="<div class='btn-row'><button class='save-btn' onclick='saveEntry(\""+dateStr+"\")'>Save Day</button><button class='cancel-btn' onclick='showPanel(\""+dateStr+"\")'>Cancel</button>"+(allData[dateStr]?"<button class='del-btn' onclick='deleteDay(\""+dateStr+"\")'>Del</button>":"")+"</div>";
   panel.innerHTML=html;
 }
 
@@ -426,17 +392,17 @@ function clearRow(i){ entryMovers[i]=EMPTY_ROW(); renderEntry(selected); }
 function updateRow(i,field,val){ entryMovers[i][field]=val; }
 
 function saveEntry(dateStr){
-  const movers=entryMovers.filter(m=>m.ticker.trim()&&m.hodPct!=="");
+  var movers=entryMovers.filter(function(m){ return m.ticker.trim()&&m.hodPct!==""; });
   if(!movers.length){ closePanel(); return; }
-  const parsed=movers.map(m=>({...m,hodPct:parseFloat(m.hodPct)||0,prevClose:parseFloat(m.prevClose)||null,hod:parseFloat(m.hod)||null,vol:parseFloat(String(m.vol).replace(/[^0-9.]/g,""))||null,float:parseFloat(m.float)||null}));
-  parsed.sort((a,b)=>b.hodPct-a.hodPct);
-  allData[dateStr]={movers:parsed,avgPct:parsed.reduce((s,m)=>s+m.hodPct,0)/parsed.length};
-  saveData(); render(); showPanel(dateStr);
+  movers=movers.map(function(m){ return Object.assign({},m,{hodPct:parseFloat(m.hodPct)||0,prevClose:parseFloat(m.prevClose)||null,hod:parseFloat(m.hod)||null,vol:parseFloat(String(m.vol).replace(/[^0-9.]/g,""))||null,float:parseFloat(m.float)||null}); });
+  movers.sort(function(a,b){ return b.hodPct-a.hodPct; });
+  allData[dateStr]={movers:movers,avgPct:movers.reduce(function(s,m){ return s+m.hodPct; },0)/movers.length};
+  render(); showPanel(dateStr);
 }
 
 function deleteDay(dateStr){
   delete allData[dateStr];
-  saveData(); closePanel();
+  closePanel();
 }
 
 loadData();
