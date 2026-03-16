@@ -192,15 +192,21 @@ function cleanData(raw){
 
 function loadData(){
   setStatus("Loading...");
-  fetch("data.json?t=" + Date.now())
-    .then(r => r.json())
-    .then(raw => {
+  var url = "data.json?t=" + Date.now();
+  fetch(url)
+    .then(function(r){
+      if(!r.ok) throw new Error("HTTP " + r.status);
+      return r.json();
+    })
+    .then(function(raw){
       allData = cleanData(raw);
-      setStatus(Object.keys(allData).length + " days loaded");
+      var count = Object.keys(allData).length;
+      setStatus(count + " days loaded");
       render();
     })
-    .catch(e => {
-      setStatus("No data yet");
+    .catch(function(e){
+      setStatus("Error: " + e.message);
+      console.error("Failed to load data.json:", e);
       render();
     });
 }
@@ -243,6 +249,10 @@ function toggleImport(){
 function closeImport(){
   document.getElementById("import-panel").style.display="none";
   document.getElementById("import-msg").textContent="";
+}
+
+function saveData(){
+  // no-op for GitHub Pages version — data is managed via data.json
 }
 
 function handleImport(){
@@ -418,18 +428,4 @@ function saveEntry(dateStr){
   const movers=entryMovers.filter(m=>m.ticker.trim()&&m.hodPct!=="");
   if(!movers.length){ closePanel(); return; }
   const parsed=movers.map(m=>({...m,hodPct:parseFloat(m.hodPct)||0,prevClose:parseFloat(m.prevClose)||null,hod:parseFloat(m.hod)||null,vol:parseFloat(String(m.vol).replace(/[^0-9.]/g,""))||null,float:parseFloat(m.float)||null}));
-  parsed.sort((a,b)=>b.hodPct-a.hodPct);
-  allData[dateStr]={movers:parsed,avgPct:parsed.reduce((s,m)=>s+m.hodPct,0)/parsed.length};
-  saveData(); render(); showPanel(dateStr);
-}
-
-function deleteDay(dateStr){
-  delete allData[dateStr];
-  saveData(); closePanel();
-}
-
-loadData();
-</script>
-</body>
-</html>
-
+  parsed.sort((a,
