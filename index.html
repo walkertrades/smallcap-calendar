@@ -192,6 +192,7 @@ function cleanData(raw){
 
 function loadData(){
   setStatus("Loading...");
+  render(); // render empty calendar immediately
   var url = "https://walkertrades.github.io/smallcap-calendar/data.json?t=" + Date.now();
   fetch(url)
     .then(function(r){
@@ -207,7 +208,6 @@ function loadData(){
     .catch(function(e){
       setStatus("Error: " + e.message);
       console.error("Failed to load data.json:", e);
-      render();
     });
 }
 
