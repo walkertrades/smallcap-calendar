@@ -196,7 +196,7 @@ function loadData(){
   // Build filename based on current month — forces CDN cache miss on new deploys
   var now = new Date();
   var stamp = now.getFullYear() + "-" + String(now.getMonth()+1).padStart(2,"0") + "-" + String(now.getDate()).padStart(2,"0");
-  var url = "https://walkertrades.github.io/smallcap-calendar/data.json?v=" + stamp;
+  var url = "https://walkertrades.github.io/smallcap-calendar/data2.json?v=" + stamp;
   fetch(url, {cache:"no-store"})
     .then(function(r){
       if(!r.ok) throw new Error("HTTP "+r.status);
